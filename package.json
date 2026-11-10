@@ -18,12 +18,8 @@
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
-    "@types/bun": "latest",
     "@types/jsonwebtoken": "^9.0.10",
     "prisma": "6.4.1"
-  },
-  "peerDependencies": {
-    "typescript": "^7"
   },
   "dependencies": {
     "@nodewave/prisma-ezfilter": "^0.2.1",
