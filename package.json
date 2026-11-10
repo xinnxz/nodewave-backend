@@ -1,0 +1,36 @@
+{
+  "name": "nodewave-backend",
+  "version": "1.0.0",
+  "description": "Nodewave Deliverables Management System — Backend API",
+  "module": "src/index.ts",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "dev": "bun run --watch src/index.ts",
+    "start": "bun run src/index.ts",
+    "typecheck": "bun check",
+    "db:push": "bunx prisma db push",
+    "db:migrate": "bunx prisma migrate dev",
+    "db:seed": "bun prisma/seed.ts",
+    "db:studio": "bunx prisma studio",
+    "db:reset": "bunx prisma db push --force-reset && bun prisma/seed.ts"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/bun": "latest",
+    "@types/jsonwebtoken": "^9.0.10",
+    "prisma": "6.4.1"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  },
+  "dependencies": {
+    "@nodewave/prisma-ezfilter": "^0.2.1",
+    "@prisma/client": "6.4.1",
+    "bcryptjs": "^3.0.3",
+    "dotenv": "^18.0.10",
+    "hono": "^4.13.17",
+    "jsonwebtoken": "^9.0.3",
+    "zod": "^4.6.7"
+  }
+}

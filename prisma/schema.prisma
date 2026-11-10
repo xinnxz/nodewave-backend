@@ -1,0 +1,153 @@
+// Prisma Schema for NodeWave Assessment
+// Operational Backbone for Deliverables Management
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  PM
+  INTERNAL_MEMBER
+  CLIENT_GUEST
+}
+
+enum Department {
+  PRODUCT
+  UIUX
+  FRONTEND
+  BACKEND
+  CLIENT
+}
+
+enum TaskStatus {
+  TODO
+  IN_PROGRESS
+  BLOCKED
+  DONE
+}
+
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  passwordHash String
+  name         String
+  role         Role
+  department   Department
+  avatarUrl    String?
+  
+  // Relations
+  assignedTasks Task[]       @relation("TaskAssignee")
+  auditLogs     AuditLog[]
+  attachments   Attachment[]
+  clientProjects Project[]   @relation("ClientProjects")
+  
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  deletedAt    DateTime?
+
+  @@index([role])
+  @@index([department])
+}
+
+model Project {
+  id          String      @id @default(uuid())
+  name        String
+  description String?
+  clientName  String
+  clientId    String?
+  client      User?       @relation("ClientProjects", fields: [clientId], references: [id])
+  
+  tasks       Task[]
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  deletedAt   DateTime?
+
+  @@index([clientId])
+}
+
+model Task {
+  id              String      @id @default(uuid())
+  projectId       String
+  project         Project     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title           String
+  description     String
+  status          TaskStatus  @default(TODO)
+  department      Department
+  assigneeId      String?
+  assignee        User?       @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  isClientVisible Boolean     @default(false)
+  version         Int         @default(1) // For Optimistic Concurrency Control (409 Conflict)
+
+  // Inter-Task Dependencies (Directed Acyclic Graph)
+  // Dependencies: tasks that THIS task depends on (must be DONE before this task starts)
+  dependencies    TaskDependency[] @relation("DependentTask")
+  // PrerequisiteFor: tasks that are waiting for THIS task to finish
+  prerequisiteFor TaskDependency[] @relation("PrerequisiteTask")
+
+  attachments     Attachment[]
+  auditLogs       AuditLog[]
+
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+  deletedAt       DateTime?
+
+  @@index([projectId])
+  @@index([assigneeId])
+  @@index([status])
+  @@index([department])
+  @@index([isClientVisible])
+}
+
+model TaskDependency {
+  id             String   @id @default(uuid())
+  taskId         String   // Task that is waiting / blocked
+  task           Task     @relation("DependentTask", fields: [taskId], references: [id], onDelete: Cascade)
+  prerequisiteId String   // Task that must be completed first
+  prerequisite   Task     @relation("PrerequisiteTask", fields: [prerequisiteId], references: [id], onDelete: Cascade)
+  
+  createdAt      DateTime @default(now())
+
+  @@unique([taskId, prerequisiteId])
+  @@index([taskId])
+  @@index([prerequisiteId])
+}
+
+model AuditLog {
+  id            String   @id @default(uuid())
+  taskId        String
+  task          Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId        String
+  user          User     @relation(fields: [userId], references: [id])
+  changedColumn String   // e.g. "status", "description", "assigneeId", "isClientVisible"
+  oldValue      String?
+  newValue      String?
+  
+  createdAt     DateTime @default(now()) // Immutable timestamp (CDC pattern)
+
+  @@index([taskId])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Attachment {
+  id        String   @id @default(uuid())
+  taskId    String
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  filename  String
+  fileUrl   String
+  fileSize  Int?
+  mimeType  String?
+  
+  createdAt DateTime @default(now())
+
+  @@index([taskId])
+  @@index([userId])
+}
