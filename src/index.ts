@@ -98,7 +98,4 @@ console.log(`
 
 export { app };
 
-export default {
-  port,
-  fetch: app.fetch,
-};
+export default app;
