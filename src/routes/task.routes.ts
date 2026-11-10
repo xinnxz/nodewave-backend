@@ -36,7 +36,7 @@ tasks.use('*', authMiddleware);
 // GET /api/projects/:projectId/tasks — List tugas dalam proyek
 tasks.get('/projects/:projectId/tasks', async (c) => {
   const user = c.get('user') as JwtPayload;
-  const projectId = c.req.param('projectId');
+  const projectId = c.req.param('projectId')!;
   const queryParams = c.req.query();
 
   try {
@@ -56,7 +56,7 @@ tasks.get('/projects/:projectId/tasks', async (c) => {
 // POST /api/projects/:projectId/tasks — Buat tugas baru (PM only)
 tasks.post('/projects/:projectId/tasks', requireRole(['PM']), async (c) => {
   const user = c.get('user') as JwtPayload;
-  const projectId = c.req.param('projectId');
+  const projectId = c.req.param('projectId')!;
   const body = await c.req.json();
   const parsed = createTaskSchema.safeParse(body);
 
@@ -80,7 +80,7 @@ tasks.post('/projects/:projectId/tasks', requireRole(['PM']), async (c) => {
 // GET /api/tasks/:id — Detail tugas
 tasks.get('/tasks/:id', async (c) => {
   const user = c.get('user') as JwtPayload;
-  const taskId = c.req.param('id');
+  const taskId = c.req.param('id')!;
 
   try {
     const task = await taskService.getTaskById(taskId, user);
@@ -99,7 +99,7 @@ tasks.get('/tasks/:id', async (c) => {
 // PATCH /api/tasks/:id — Update field tugas (PM only + optimistic locking)
 tasks.patch('/tasks/:id', requireRole(['PM']), async (c) => {
   const user = c.get('user') as JwtPayload;
-  const taskId = c.req.param('id');
+  const taskId = c.req.param('id')!;
   const body = await c.req.json();
   const parsed = updateTaskSchema.safeParse(body);
 
@@ -126,7 +126,7 @@ tasks.patch('/tasks/:id', requireRole(['PM']), async (c) => {
 // PATCH /api/tasks/:id/status — Ubah status tugas (ABAC + deps + locking)
 tasks.patch('/tasks/:id/status', async (c) => {
   const user = c.get('user') as JwtPayload;
-  const taskId = c.req.param('id');
+  const taskId = c.req.param('id')!;
   const body = await c.req.json();
   const parsed = updateTaskStatusSchema.safeParse(body);
 
@@ -167,7 +167,7 @@ tasks.patch('/tasks/:id/status', async (c) => {
 // DELETE /api/tasks/:id — Soft delete tugas (PM only)
 tasks.delete('/tasks/:id', requireRole(['PM']), async (c) => {
   const user = c.get('user') as JwtPayload;
-  const taskId = c.req.param('id');
+  const taskId = c.req.param('id')!;
 
   try {
     await taskService.deleteTask(taskId, user);
@@ -187,7 +187,7 @@ tasks.delete('/tasks/:id', requireRole(['PM']), async (c) => {
 // POST /api/tasks/:id/dependencies — Tambah dependensi (PM only)
 tasks.post('/tasks/:id/dependencies', requireRole(['PM']), async (c) => {
   const user = c.get('user') as JwtPayload;
-  const taskId = c.req.param('id');
+  const taskId = c.req.param('id')!;
   const body = await c.req.json();
   const parsed = addDependencySchema.safeParse(body);
 
@@ -220,7 +220,7 @@ tasks.post('/tasks/:id/dependencies', requireRole(['PM']), async (c) => {
 
 // GET /api/tasks/:id/dependencies — List dependensi tugas
 tasks.get('/tasks/:id/dependencies', async (c) => {
-  const taskId = c.req.param('id');
+  const taskId = c.req.param('id')!;
 
   try {
     const deps = await dependencyService.getTaskDependencies(taskId);
@@ -238,8 +238,8 @@ tasks.delete(
   '/tasks/:taskId/dependencies/:depId',
   requireRole(['PM']),
   async (c) => {
-    const taskId = c.req.param('taskId');
-    const depId = c.req.param('depId');
+    const taskId = c.req.param('taskId')!;
+    const depId = c.req.param('depId')!;
 
     try {
       const result = await dependencyService.removeDependency(taskId, depId);
@@ -263,7 +263,7 @@ tasks.post(
   requireRole(['PM', 'INTERNAL_MEMBER']),
   async (c) => {
     const user = c.get('user') as JwtPayload;
-    const taskId = c.req.param('id');
+    const taskId = c.req.param('id')!;
     const body = await c.req.json();
     const parsed = createAttachmentSchema.safeParse(body);
 
@@ -291,7 +291,7 @@ tasks.post(
 // GET /api/tasks/:id/attachments — List lampiran tugas
 tasks.get('/tasks/:id/attachments', async (c) => {
   const user = c.get('user') as JwtPayload;
-  const taskId = c.req.param('id');
+  const taskId = c.req.param('id')!;
 
   try {
     const attachments = await taskService.getTaskAttachments(taskId, user);
@@ -316,7 +316,7 @@ tasks.get(
   '/tasks/:id/audit-logs',
   requireRole(['PM', 'INTERNAL_MEMBER']),
   async (c) => {
-    const taskId = c.req.param('id');
+    const taskId = c.req.param('id')!;
 
     try {
       const logs = await auditService.getTaskAuditLogs(taskId);
@@ -332,7 +332,7 @@ tasks.get(
 
 // GET /api/projects/:id/daily-summary — Daily standup summary (PM only, Bonus)
 tasks.get('/projects/:id/daily-summary', requireRole(['PM']), async (c) => {
-  const projectId = c.req.param('id');
+  const projectId = c.req.param('id')!;
 
   try {
     const summary = await auditService.getDailyStandupSummary(projectId);

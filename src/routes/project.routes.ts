@@ -43,7 +43,7 @@ projects.post('/', requireRole(['PM']), async (c) => {
 // GET /api/projects/:id — Detail proyek
 projects.get('/:id', async (c) => {
   const user = c.get('user') as JwtPayload;
-  const projectId = c.req.param('id');
+  const projectId = c.req.param('id')!;
 
   try {
     const project = await projectService.getProjectById(projectId, user);
@@ -61,7 +61,7 @@ projects.get('/:id', async (c) => {
 
 // PATCH /api/projects/:id — Update proyek (PM only)
 projects.patch('/:id', requireRole(['PM']), async (c) => {
-  const projectId = c.req.param('id');
+  const projectId = c.req.param('id')!;
   const body = await c.req.json();
   const parsed = updateProjectSchema.safeParse(body);
 
@@ -84,7 +84,7 @@ projects.patch('/:id', requireRole(['PM']), async (c) => {
 
 // DELETE /api/projects/:id — Soft delete proyek (PM only)
 projects.delete('/:id', requireRole(['PM']), async (c) => {
-  const projectId = c.req.param('id');
+  const projectId = c.req.param('id')!;
 
   try {
     await projectService.deleteProject(projectId);

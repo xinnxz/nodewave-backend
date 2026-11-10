@@ -3,6 +3,12 @@ import { HTTPException } from 'hono/http-exception';
 import { verifyToken, type JwtPayload } from '../lib/jwt';
 import type { Role } from '@prisma/client';
 
+declare module 'hono' {
+  interface ContextVariableMap {
+    user: JwtPayload;
+  }
+}
+
 /**
  * Auth Middleware — JWT Verification
  *

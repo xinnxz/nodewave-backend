@@ -8,8 +8,7 @@
   "scripts": {
     "dev": "bun run --watch src/index.ts",
     "start": "bun run src/index.ts",
-    "build": "prisma generate",
-    "postinstall": "prisma generate",
+    "build": "node ./node_modules/prisma/build/index.js generate",
     "typecheck": "bun check",
     "db:push": "bunx prisma db push",
     "db:migrate": "bunx prisma migrate dev",
@@ -33,6 +32,6 @@
     "dotenv": "^18.0.10",
     "hono": "^4.13.17",
     "jsonwebtoken": "^9.0.3",
-    "zod": "^4.6.7"
+    "zod": "3.24.2"
   }
 }
