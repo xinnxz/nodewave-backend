@@ -18,7 +18,8 @@
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.10",
-    "prisma": "6.4.1"
+    "prisma": "6.4.1",
+    "typescript": "^5.8.2"
   },
   "dependencies": {
     "@nodewave/prisma-ezfilter": "^0.2.1",

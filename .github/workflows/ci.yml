@@ -27,3 +27,6 @@ jobs:
 
       - name: Typecheck TypeScript (Strict)
         run: bunx tsc --noEmit
+
+      - name: Run Unit & Security Tests
+        run: bun test
