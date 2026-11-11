@@ -4,6 +4,8 @@ import { registerSchema, loginSchema } from '../validators/auth.validator';
 import * as authService from '../services/auth.service';
 import { authMiddleware } from '../middlewares/auth';
 import type { JwtPayload } from '../lib/jwt';
+import { prisma } from '../lib/prisma';
+import { signToken } from '../lib/jwt';
 
 /**
  * Auth Routes
@@ -57,6 +59,47 @@ auth.post('/login', async (c) => {
     }
     throw err;
   }
+});
+
+// POST /api/auth/quick-switch — Seamless Evaluator Persona Switch
+auth.post('/quick-switch', async (c) => {
+  const body = await c.req.json();
+  const email = body?.email;
+  if (!email) {
+    throw new HTTPException(400, { message: 'Email is required' });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { email },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      role: true,
+      department: true,
+      avatarUrl: true,
+      createdAt: true,
+    },
+  });
+
+  if (!user) {
+    throw new HTTPException(404, { message: 'Persona user not found' });
+  }
+
+  const token = signToken({
+    userId: user.id,
+    email: user.email,
+    role: user.role,
+    department: user.department,
+  });
+
+  return c.json({
+    success: true,
+    data: {
+      user,
+      token,
+    },
+  });
 });
 
 // POST /api/auth/logout — Logout session (protected)
