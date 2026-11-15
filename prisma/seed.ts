@@ -163,18 +163,18 @@ async function main() {
     },
   });
 
-  // Task 4: UI Design Cart — IN_PROGRESS
+  // Task 4: UI Design Cart — DONE (Prerequisite for Frontend Cart Slicing)
   const taskUICart = await prisma.task.create({
     data: {
       projectId: project.id,
       title: 'Design Shopping Cart UI',
       description:
         'Desain UI untuk halaman shopping cart: item list, quantity selector, price calculator, dan checkout flow.',
-      status: 'IN_PROGRESS',
+      status: 'DONE',
       department: 'UIUX',
       assigneeId: uiux.id,
       isClientVisible: true,
-      version: 1,
+      version: 2,
     },
   });
 
